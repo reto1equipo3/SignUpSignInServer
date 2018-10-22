@@ -2,6 +2,7 @@ package exception;
 
 /**
  * Exception associated to an error ocurred at signing in.
+ *
  * @author Imanol
  */
 public class LoginNotExistingException extends Exception {
