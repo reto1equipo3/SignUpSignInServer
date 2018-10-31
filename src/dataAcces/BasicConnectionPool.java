@@ -15,6 +15,10 @@ import java.util.logging.Logger;
 public class BasicConnectionPool implements ConnectionPool {
 
 	/**
+	 * Data acces logger
+	 */
+	private static final Logger LOGGER = Logger.getLogger("dataAccess");
+	/**
 	 * Database URL
 	 */
 	private final String url;
@@ -68,6 +72,8 @@ public class BasicConnectionPool implements ConnectionPool {
 	 * @throws SQLException Database exception.
 	 */
 	public static BasicConnectionPool create(String url, String user, String password) throws SQLException {
+		LOGGER.info("BasicConnectionPool::create: creating connection pool.");
+
 		List<Connection> pool = new ArrayList<>(INITIAL_POOL_SIZE);
 		for (int i = 0; i < INITIAL_POOL_SIZE; i++) {
 			pool.add(createConnection(url, user, password));
@@ -83,6 +89,8 @@ public class BasicConnectionPool implements ConnectionPool {
 	 */
 	@Override
 	public Connection getConnection() throws SQLException {
+		LOGGER.info("BasicConnectionPool::getConnection: getting a connection.");
+
 		if (connectionPool.isEmpty()) {
 			if (usedConnections.size()<MAX_POOL_SIZE) {
 				connectionPool.add(createConnection(url, user, password));
@@ -104,6 +112,7 @@ public class BasicConnectionPool implements ConnectionPool {
 	 */
 	@Override
 	public boolean releaseConnection(Connection connection) {
+		LOGGER.info("BasicConnectionPool::releaseConnection: releasing a connection.");
 		connectionPool.add(connection);
 		return usedConnections.remove(connection);
 	}
@@ -115,11 +124,6 @@ public class BasicConnectionPool implements ConnectionPool {
 	 * @throws SQLException
 	 */
 	private static Connection createConnection(String url, String user, String password) throws SQLException {
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-		} catch (ClassNotFoundException ex) {
-			Logger.getLogger(BasicConnectionPool.class.getName()).log(Level.SEVERE, null, ex);
-		}
 		return DriverManager.getConnection(url, user, password);
 	}
 
@@ -178,6 +182,7 @@ public class BasicConnectionPool implements ConnectionPool {
 	 */
 	@Override
 	public void shutdown() throws SQLException{
+		LOGGER.info("BasicConnectionPool::shutdown: shutting down connection pool.");
 		usedConnections.forEach(this::releaseConnection);
 		for (Connection connection : connectionPool) {
 			connection.close();
