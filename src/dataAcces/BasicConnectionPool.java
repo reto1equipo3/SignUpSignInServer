@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -39,7 +41,7 @@ public class BasicConnectionPool implements ConnectionPool {
 	/**
 	 * Maximun amount of connections allowed.
 	 */
-	private final int MAX_POOL_SIZE = 6;
+	private final int MAX_POOL_SIZE = 10;
 
 	/**
 	 * Constructor using params.
@@ -113,6 +115,11 @@ public class BasicConnectionPool implements ConnectionPool {
 	 * @throws SQLException
 	 */
 	private static Connection createConnection(String url, String user, String password) throws SQLException {
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException ex) {
+			Logger.getLogger(BasicConnectionPool.class.getName()).log(Level.SEVERE, null, ex);
+		}
 		return DriverManager.getConnection(url, user, password);
 	}
 
