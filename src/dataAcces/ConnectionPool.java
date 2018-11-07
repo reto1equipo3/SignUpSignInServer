@@ -16,6 +16,7 @@ public interface ConnectionPool {
 	 * Gets a {@link Connection} from the connection pool.
 	 *
 	 * @return Connection instance.
+	 * @throws SQLException Database exception.
 	 */
 	public Connection getConnection() throws SQLException;
 

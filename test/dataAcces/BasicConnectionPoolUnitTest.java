@@ -25,7 +25,7 @@ public class BasicConnectionPoolUnitTest {
 	@BeforeClass
 	public static void setUpBasicConnectionPoolInstance() throws SQLException {
 		connectionPool = BasicConnectionPool.create(
-			"jdbc:mysql://macinf01.tartangalh.eus:3306/reto1_equipo3",
+			"jdbc:mysql://lapinf04.tartangalh.eus:3306/reto1_equipo3",
 			"root",
 			"abcd*1234");
 	}
@@ -56,7 +56,7 @@ public class BasicConnectionPoolUnitTest {
 	 */
 	@Test
 	public void givenBasicConnectionPoolInstance_whenCalledgetUrl_thenCorrect() {
-		assertTrue(connectionPool.getUrl().equals("jdbc:mysql://macinf01.tartangalh.eus:3306/reto1_equipo3"));
+		assertTrue(connectionPool.getUrl().equals("jdbc:mysql://lapinf04.tartangalh.eus:3306/reto1_equipo3"));
 	}
 
 	/**
@@ -80,10 +80,10 @@ public class BasicConnectionPoolUnitTest {
 	 *
 	 * @throws SQLException
 	 */
-	@Test
+	@Test(expected = RuntimeException.class)
 	public void givenBasicConnectionPoolInstance_whenAskedMoreThanMax_thenError() throws SQLException {
 		ConnectionPool cp = BasicConnectionPool.create(
-			"jdbc:mysql://macinf01.tartangalh.eus:3306/reto1_equipo3",
+			"jdbc:mysql://lapinf04.tartangalh.eus:3306/reto1_equipo3",
 			"root",
 			"abcd*1234");
 
@@ -102,7 +102,7 @@ public class BasicConnectionPoolUnitTest {
 	@Test
 	public void givenBasicConnectionPoolInstance_whenShutdown_thenEmpty() throws SQLException {
 		ConnectionPool cp = BasicConnectionPool.create(
-			"jdbc:mysql://macinf01.tartangalh.eus:3306/reto1_equipo3",
+			"jdbc:mysql://lapinf04.tartangalh.eus:3306/reto1_equipo3",
 			"root",
 			"abcd*1234");
 		assertTrue(((BasicConnectionPool) cp).getSize() == 6);

@@ -9,10 +9,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Basic implementation of {@link ConnectionPool}.
  *
  * @author Imanol
  */
 public class BasicConnectionPool implements ConnectionPool {
+
+	private static BasicConnectionPool instance;
 
 	/**
 	 * Data acces logger
@@ -74,11 +77,19 @@ public class BasicConnectionPool implements ConnectionPool {
 	public static BasicConnectionPool create(String url, String user, String password) throws SQLException {
 		LOGGER.info("BasicConnectionPool::create: creating connection pool.");
 
-		List<Connection> pool = new ArrayList<>(INITIAL_POOL_SIZE);
-		for (int i = 0; i < INITIAL_POOL_SIZE; i++) {
-			pool.add(createConnection(url, user, password));
+		if (instance == null) {
+			synchronized (BasicConnectionPool.class) {
+				if (instance == null) {
+					List<Connection> pool = new ArrayList<>(INITIAL_POOL_SIZE);
+					for (int i = 0; i < INITIAL_POOL_SIZE; i++) {
+						pool.add(createConnection(url, user, password));
+					}
+					instance = new BasicConnectionPool(url, user, password, pool);
+				}
+			}
 		}
-		return new BasicConnectionPool(url, user, password, pool);
+
+		return instance;
 	}
 
 	/**
@@ -92,12 +103,12 @@ public class BasicConnectionPool implements ConnectionPool {
 		LOGGER.info("BasicConnectionPool::getConnection: getting a connection.");
 
 		if (connectionPool.isEmpty()) {
-			if (usedConnections.size()<MAX_POOL_SIZE) {
+			if (usedConnections.size() < MAX_POOL_SIZE) {
 				connectionPool.add(createConnection(url, user, password));
 			} else {
 				throw new RuntimeException("Maximum pool size reached, no available connections!");
 			}
-	
+
 		}
 		Connection connection = connectionPool.remove(connectionPool.size() - 1);
 		usedConnections.add(connection);
@@ -124,7 +135,16 @@ public class BasicConnectionPool implements ConnectionPool {
 	 * @throws SQLException
 	 */
 	private static Connection createConnection(String url, String user, String password) throws SQLException {
-		return DriverManager.getConnection(url, user, password);
+		Connection connection = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			connection = DriverManager.getConnection(url, user, password);
+		} catch (ClassNotFoundException e) {
+			LOGGER.log(Level.SEVERE,
+				"BasicConnectionPool::createConnection: Exception with Driver name",
+				e.getMessage());
+		}
+		return connection;
 	}
 
 	/**
@@ -176,12 +196,14 @@ public class BasicConnectionPool implements ConnectionPool {
 	public String getPassword() {
 		return password;
 	}
+
 	/**
 	 * Shuts down the connections and the pool.
+	 *
 	 * @throws SQLException Database exception.
 	 */
 	@Override
-	public void shutdown() throws SQLException{
+	public void shutdown() throws SQLException {
 		LOGGER.info("BasicConnectionPool::shutdown: shutting down connection pool.");
 		usedConnections.forEach(this::releaseConnection);
 		for (Connection connection : connectionPool) {
