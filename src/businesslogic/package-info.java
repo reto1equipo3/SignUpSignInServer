@@ -3,4 +3,4 @@
  * the data access tire of the SignUpSignIn app.
  * @author Imanol
  */
-package serverLogic;
+package businesslogic;

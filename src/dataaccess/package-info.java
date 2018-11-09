@@ -3,4 +3,4 @@
  * database of the SignUpSignIn app.
  * @author Imanol
  */
-package dataAcces;
+package dataaccess;
