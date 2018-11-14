@@ -208,8 +208,8 @@ public class DAOImplementation implements DAO {
 					stmt.setString(1, user.getLogin().trim().toLowerCase());
 					stmt.setString(2, user.getFullName().trim().toLowerCase());
 					stmt.setString(3, user.getEmail().trim().toLowerCase());
-					stmt.setInt(4, user.getStatus().ordinal() + 1);
-					stmt.setInt(5, user.getPrivilege().ordinal() + 1);
+					stmt.setInt(4, 1);
+					stmt.setInt(5, 2);
 					stmt.setString(6, user.getPassword().trim());
 					stmt.setDate(7, Date.valueOf(LocalDate.now()));
 					stmt.setDate(8, Date.valueOf(LocalDate.now()));

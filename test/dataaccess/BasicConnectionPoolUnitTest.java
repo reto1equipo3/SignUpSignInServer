@@ -53,7 +53,6 @@ public class BasicConnectionPoolUnitTest {
 	@BeforeClass
 	public static void setUpBasicConnectionPoolInstance() throws SQLException {
 		LOGGER.info("BasicConnectionPoolUnitTest::setUpBasicConnectionPoolInstance: Beginng setting connection pool instance.");
-		//connectionPool = BasicConnectionPool.create( "jdbc:mysql://lapinf04.tartangalh.eus:3306/reto1_equipo3", "root", "abcd*1234");
 		connectionPool = BasicConnectionPool.create(URL, USER, PASSWORD);
 	}
 
@@ -86,7 +85,7 @@ public class BasicConnectionPoolUnitTest {
 	@Test
 	public void test3_givenBasicConnectionPoolInstance_whenCalledgetUrl_thenCorrect() {
 		LOGGER.info("BasicConnectionPoolUnitTest::test3: Beginng get url test.");
-		assertTrue(connectionPool.getUrl().equals("jdbc:mysql://lapinf04.tartangalh.eus:3306/reto1_equipo3"));
+		assertTrue(connectionPool.getUrl().equals(URL));
 	}
 
 	/**
@@ -95,7 +94,7 @@ public class BasicConnectionPoolUnitTest {
 	@Test
 	public void test4_givenBasicConnectionPoolInstance_whenCalledgetUser_thenCorrect() {
 		LOGGER.info("BasicConnectionPoolUnitTest::test4: Beginng get user test.");
-		assertTrue(connectionPool.getUser().equals("root"));
+		assertTrue(connectionPool.getUser().equals(USER));
 	}
 
 	/**
@@ -104,7 +103,7 @@ public class BasicConnectionPoolUnitTest {
 	@Test
 	public void tes5_givenBasicConnectionPoolInstance_whenCalledgetPassword_thenCorrect() {
 		LOGGER.info("BasicConnectionPoolUnitTest::test5: Beginng get password test.");
-		assertTrue(connectionPool.getPassword().equals("abcd*1234"));
+		assertTrue(connectionPool.getPassword().equals(PASSWORD));
 	}
 
 	/**
@@ -115,7 +114,6 @@ public class BasicConnectionPoolUnitTest {
 	@Test(expected = RuntimeException.class)
 	public void test6_givenBasicConnectionPoolInstance_whenAskedMoreThanMax_thenError() throws SQLException {
 		LOGGER.info("BasicConnectionPoolUnitTest::test6: Beginng asked more than max test.");
-		//ConnectionPool cp = BasicConnectionPool.create( "jdbc:mysql://lapinf04.tartangalh.eus:3306/reto1_equipo3", "root", "abcd*1234");
 		ConnectionPool cp = BasicConnectionPool.create(URL, USER, PASSWORD);
 
 		final int MAX_POOL_SIZE = 20;
@@ -133,7 +131,6 @@ public class BasicConnectionPoolUnitTest {
 	@Test
 	public void tes7_givenBasicConnectionPoolInstance_whenShutdown_thenEmpty() throws SQLException {
 		LOGGER.info("BasicConnectionPoolUnitTest::test7: Beginng shutdown test.");
-		//ConnectionPool cp = BasicConnectionPool.create( "jdbc:mysql://lapinf04.tartangalh.eus:3306/reto1_equipo3", "root", "abcd*1234");
 		ConnectionPool cp = BasicConnectionPool.create(URL, USER, PASSWORD);
 		assertTrue(cp.getSize() == 6);
 

@@ -67,11 +67,11 @@ public class DAOImplementationTest {
 		LOGGER.info("DAOImplementationTest::test00: Beginning valid signing in test.");
 		UserBean user = new UserBean();
 		user.setLogin("Leticia");
-		user.setPassword("Abcd*123");
+		user.setPassword("Abcd*1234");
 
 		UserBean resultUser = dao.signIn(user);
-		assertEquals(resultUser.getFullName().trim().toLowerCase(), "leticia garcia zarragoitia");
-		assertEquals(resultUser.getEmail().trim().toLowerCase(), "letogz@gmail.com");
+		assertEquals(resultUser.getFullName().trim().toLowerCase(), "leticia garcia");
+		assertEquals(resultUser.getEmail().trim().toLowerCase(), "leticia@email.com");
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class DAOImplementationTest {
 		LOGGER.info("DAOImplementationTest::test01: Beginning wrong login signing in test.");
 		UserBean user = new UserBean();
 		user.setLogin("asdsadf");
-		user.setPassword("Abcd*123");
+		user.setPassword("Abcd*1234");
 
 		dao.signIn(user);
 		fail();
@@ -138,7 +138,7 @@ public class DAOImplementationTest {
 	@Test
 	public void test05_SignUp() throws Exception {
 		LOGGER.info("DAOImplementationTest::test05: Beginning signing up test.");
-		UserBean user = new UserBean(null, "PacoPico12", "pacopico12@gmail.com", "Paco Pico", UserStatus.ENABLED, UserPrivilege.USER, "Abcd*1234", null, null, null);
+		UserBean user = new UserBean(null, "test01", "test01@gmail.com", "Test User", UserStatus.ENABLED, UserPrivilege.USER, "Abcd*1234", null, null);
 		dao.signUp(user);
 	}
 
@@ -149,7 +149,7 @@ public class DAOImplementationTest {
 	@Test(expected = LoginExistingException.class)
 	public void test06_signUp_repeatedLogin() throws Exception {
 		LOGGER.info("DAOImplementationTest::test06: Beginning repeated login signing up test.");
-		UserBean user = new UserBean(null, "Leticia", "letogz@gmail.com", "Leticia", UserStatus.ENABLED, UserPrivilege.USER, "Abcd*1234", null, null, null);
+		UserBean user = new UserBean(null, "Leticia", "leticia@email.com", "Leticia", UserStatus.ENABLED, UserPrivilege.USER, "Abcd*1234", null, null);
 		dao.signUp(user);
 		fail();
 	}
@@ -161,7 +161,7 @@ public class DAOImplementationTest {
 	@Test(expected = EmailNotUniqueException.class)
 	public void test07_signUp_repeatedEmail() throws Exception {
 		LOGGER.info("DAOImplementationTest::test07: Beginning repeated email signing up test.");
-		UserBean user = new UserBean(null, "aaaaa", "letogz@gmail.com", "Leticia", UserStatus.ENABLED, UserPrivilege.USER, "Abcd*1234", null, null, null);
+		UserBean user = new UserBean(null, "aaaaa", "leticia@email.com", "Leticia", UserStatus.ENABLED, UserPrivilege.USER, "Abcd*1234", null, null);
 		dao.signUp(user);
 		fail();
 	}
@@ -176,7 +176,7 @@ public class DAOImplementationTest {
 		UserBean user = new UserBean();
 		user.setFullName("Leticia Garcia");
 		user.setLogin("Leticia");
-		user.setEmail("leti@gmail.com");
+		user.setEmail("leticia@email.com");
 		user.setPassword("Abcd*1234");
 
 		dao.logOut(user);
