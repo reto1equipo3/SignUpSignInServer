@@ -139,6 +139,22 @@ public class ConnectionThread extends Thread {
 			LOGGER.log(Level.SEVERE,
 				"ConnectionThread::run: Could not connect anything.",
 				ex.getMessage());
+		} finally {
+			try {
+				if (oOutputStream!= null) {
+					oOutputStream.close();
+				}
+				if (oInputStream!= null) {
+					oInputStream.close();
+				}
+				if (socket != null) {
+					socket.close();
+				}
+			} catch (IOException ex) {
+				LOGGER.log(Level.SEVERE,
+					"ConnectionThread::run: Could not close socket.",
+					ex.getMessage());
+			}
 		}
 	}
 }
