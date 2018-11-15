@@ -1,5 +1,6 @@
 package dataaccess;
 
+import exceptions.DatabaseException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
@@ -44,6 +45,7 @@ public class BasicConnectionPoolUnitTest {
 	 * Password of the database.
 	 */
 	private static final String PASSWORD = ResourceBundle.getBundle("config.DatabaseParameters").getString("PASSWORD");
+	private static final int MAX_CONNECTIONS = Integer.parseInt(ResourceBundle.getBundle("config.DatabaseParameters").getString("MAX_CONNECTIONS"));
 
 	/**
 	 * Creates a {@link Connection} pool before the tests are executed.
@@ -53,7 +55,7 @@ public class BasicConnectionPoolUnitTest {
 	@BeforeClass
 	public static void setUpBasicConnectionPoolInstance() throws SQLException {
 		LOGGER.info("BasicConnectionPoolUnitTest::setUpBasicConnectionPoolInstance: Beginng setting connection pool instance.");
-		connectionPool = BasicConnectionPool.create(URL, USER, PASSWORD);
+		connectionPool = BasicConnectionPool.create(URL, USER, PASSWORD, MAX_CONNECTIONS);
 	}
 
 	/**
@@ -62,7 +64,7 @@ public class BasicConnectionPoolUnitTest {
 	 * @throws SQLException
 	 */
 	@Test
-	public void test1_givenBasicConnectionPoolInstance_whenCalledgetConnection_thenCorrect() throws SQLException {
+	public void test1_givenBasicConnectionPoolInstance_whenCalledgetConnection_thenCorrect() throws SQLException, DatabaseException {
 		LOGGER.info("BasicConnectionPoolUnitTest::test1: Beginng get connection test.");
 		assertTrue(connectionPool.getConnection().isValid(1));
 	}
@@ -73,7 +75,7 @@ public class BasicConnectionPoolUnitTest {
 	 * @throws SQLException
 	 */
 	@Test
-	public void test2_givenBasicConnectionPoolInstance_whenCalledreleaseConnection_thenCorrect() throws SQLException {
+	public void test2_givenBasicConnectionPoolInstance_whenCalledreleaseConnection_thenCorrect() throws SQLException, DatabaseException {
 		LOGGER.info("BasicConnectionPoolUnitTest::test2: Beginng release connection test.");
 		Connection connection = connectionPool.getConnection();
 		assertTrue(connectionPool.releaseConnection(connection));
@@ -111,10 +113,10 @@ public class BasicConnectionPoolUnitTest {
 	 *
 	 * @throws SQLException
 	 */
-	@Test(expected = RuntimeException.class)
-	public void test6_givenBasicConnectionPoolInstance_whenAskedMoreThanMax_thenError() throws SQLException {
+	@Test(expected = DatabaseException.class)
+	public void test6_givenBasicConnectionPoolInstance_whenAskedMoreThanMax_thenError() throws SQLException, DatabaseException {
 		LOGGER.info("BasicConnectionPoolUnitTest::test6: Beginng asked more than max test.");
-		ConnectionPool cp = BasicConnectionPool.create(URL, USER, PASSWORD);
+		ConnectionPool cp = BasicConnectionPool.create(URL, USER, PASSWORD, MAX_CONNECTIONS);
 
 		final int MAX_POOL_SIZE = 20;
 		for (int i = 0; i < MAX_POOL_SIZE; i++) {
@@ -131,9 +133,9 @@ public class BasicConnectionPoolUnitTest {
 	@Test
 	public void tes7_givenBasicConnectionPoolInstance_whenShutdown_thenEmpty() throws SQLException {
 		LOGGER.info("BasicConnectionPoolUnitTest::test7: Beginng shutdown test.");
-		ConnectionPool cp = BasicConnectionPool.create(URL, USER, PASSWORD);
-		assertTrue(cp.getSize() == 6);
-
+		ConnectionPool cp = BasicConnectionPool.create(URL, USER, PASSWORD, MAX_CONNECTIONS);
+		assertTrue(cp.getSize() == MAX_CONNECTIONS/2);
+		
 		cp.shutdown();
 		assertTrue(cp.getSize() == 0);
 	}

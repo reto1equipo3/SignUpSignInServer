@@ -1,5 +1,6 @@
 package dataaccess;
 
+import exceptions.DatabaseException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -18,7 +19,7 @@ public interface ConnectionPool {
 	 * @return Connection instance.
 	 * @throws SQLException Database exception.
 	 */
-	public Connection getConnection() throws SQLException;
+	public Connection getConnection() throws DatabaseException, SQLException;
 
 	/**
 	 * Release a {@link Connection} of the connection pool.

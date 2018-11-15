@@ -54,6 +54,7 @@ public class DAOImplementation implements DAO {
 	 * Password of the database.
 	 */
 	private static final String PASSWORD = ResourceBundle.getBundle("config.DatabaseParameters").getString("PASSWORD");
+	private static final int MAX_CONNECTIONS = Integer.parseInt(ResourceBundle.getBundle("config.DatabaseParameters").getString("MAX_CONNECTIONS"));
 
 	/**
 	 * DAOImplementation constructor. If it is the first DAOImplementation being
@@ -68,7 +69,8 @@ public class DAOImplementation implements DAO {
 				if (connectionPool == null) {
 					LOGGER.info("DAOImplementation::constructor: Creating connection pool.");
 					try {
-						connectionPool = BasicConnectionPool.create(URL, USER, PASSWORD);
+						connectionPool = BasicConnectionPool.create(URL, USER, PASSWORD, MAX_CONNECTIONS);
+						LOGGER.info("Connected to: "+URL+" with "+USER+"("+PASSWORD+")");
 					} catch (SQLException ex) {
 						LOGGER.log(Level.SEVERE,
 							"DAOImplementation::constructor: Exception creating connection pool.",
@@ -132,7 +134,8 @@ public class DAOImplementation implements DAO {
 							"DAOImplementation::signIn: Exception user was not found.");
 						throw new LoginNotExistingException("Login was not found!");
 					}
-				} catch (SQLException ex) {
+				} catch(RuntimeException ex){
+				}catch (SQLException ex) {
 					LOGGER.log(Level.SEVERE,
 						"DAOImplementation::signIn: Exception connecting to database",
 						ex.getMessage());

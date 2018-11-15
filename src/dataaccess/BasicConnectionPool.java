@@ -1,5 +1,6 @@
 package dataaccess;
 
+import exceptions.DatabaseException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -44,13 +45,9 @@ public class BasicConnectionPool implements ConnectionPool {
 	 */
 	private final List<Connection> usedConnections = new ArrayList<>();
 	/**
-	 * Initial amount of connections.
-	 */
-	private static final int INITIAL_POOL_SIZE = 6;
-	/**
 	 * Maximun amount of connections allowed.
 	 */
-	private final int MAX_POOL_SIZE = 10;
+	private static int MAX_POOL_SIZE;
 
 	/**
 	 * Private constructor using params.
@@ -74,17 +71,19 @@ public class BasicConnectionPool implements ConnectionPool {
 	 * @param url The database url to connect to.
 	 * @param user User to connect with.
 	 * @param password Password to connect with.
+	 * @param max_size Max connection amount.
 	 * @return New connection pool.
 	 * @throws SQLException Database exception.
 	 */
-	public static BasicConnectionPool create(String url, String user, String password) throws SQLException {
+	public static BasicConnectionPool create(String url, String user, String password, int max_size) throws SQLException {
 		LOGGER.info("BasicConnectionPool::create: Beginning connection pool creation.");
 
 		if (instance == null) {
 			synchronized (BasicConnectionPool.class) {
 				if (instance == null) {
-					List<Connection> pool = new ArrayList<>(INITIAL_POOL_SIZE);
-					for (int i = 0; i < INITIAL_POOL_SIZE; i++) {
+					MAX_POOL_SIZE = max_size;
+					List<Connection> pool = new ArrayList<>(max_size/2);
+					for (int i = 0; i < max_size/2; i++) {
 						pool.add(createConnection(url, user, password));
 					}
 					instance = new BasicConnectionPool(url, user, password, pool);
@@ -99,10 +98,11 @@ public class BasicConnectionPool implements ConnectionPool {
 	 * Gets a {@link Connection} from the connection pool.
 	 *
 	 * @return Connection instance.
+	 * @throws exceptions.DatabaseException
 	 * @throws java.sql.SQLException
 	 */
 	@Override
-	public Connection getConnection() throws SQLException {
+	public Connection getConnection() throws DatabaseException, SQLException {
 		LOGGER.info("BasicConnectionPool::getConnection: Beginning getting connection.");
 
 		if (connectionPool.isEmpty()) {
@@ -111,7 +111,7 @@ public class BasicConnectionPool implements ConnectionPool {
 			} else {
 				LOGGER.log(Level.SEVERE,
 					"BasicConnectionPool::getConnection: Exception max connection pool size reached.");
-				throw new RuntimeException("Maximum pool size reached, no available connections!");
+				throw new DatabaseException("Maximum pool size reached, no available connections!");
 			}
 		}
 		// Get a connection from the pool and save it as used
@@ -129,8 +129,9 @@ public class BasicConnectionPool implements ConnectionPool {
 	@Override
 	public boolean releaseConnection(Connection connection) {
 		LOGGER.info("BasicConnectionPool::releaseConnection: Beginning releasing a connection.");
+		boolean releasedCorrectly = usedConnections.remove(connection);
 		connectionPool.add(connection);
-		return usedConnections.remove(connection);
+		return releasedCorrectly;
 	}
 
 	/**
